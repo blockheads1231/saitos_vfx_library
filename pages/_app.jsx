@@ -1,4 +1,3 @@
-// pages/_app.jsx
 import 'nextra-theme-docs/style.css'
 import { useMDXComponents } from 'nextra-theme-docs'
 

@@ -7,5 +7,5 @@ const withNextra = nextra({
 
 export default withNextra({
   reactStrictMode: true,
-  pageExtensions: ['ts', 'tsx', 'md', 'mdx']
+pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx']
 })
