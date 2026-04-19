@@ -20,7 +20,7 @@ const targets = [
   'system.status: dreaming...',
   'system.status: tired...',
   'error 404',
-  'system.stats: haha.',
+  'system.status: haha.',
   'system is cooked',
   'Keep me waiting!',
   'ピニク'
