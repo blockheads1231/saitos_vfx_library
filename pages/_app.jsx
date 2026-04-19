@@ -26,9 +26,7 @@ const targets = [
   'The cake is not real',
   ':)',
   'F',
-  '꧁⎝ 𓆩༺✧༻𓆪 ⎠꧂',
-  '𓆰𓆪',
-  '𓆩✧𓆪'
+  '꧁⎝ 𓆩༺✧༻𓆪 ⎠꧂'
 ]
 
 const GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/\\'
