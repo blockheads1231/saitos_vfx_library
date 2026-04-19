@@ -1,0 +1,20 @@
+## **Download**
+To use the library you'll need to get it as a model in the [Roblox Store](https://create.roblox.com/store/asset/134169661187830/VFXLibrary)
+as a package that you can always update to the latest published version.
+
+## **Studio Setup**
+
+After installing the package, you'll need to initialize it once on the client. After that you are good to use the effects of the library wherever.
+
+```lua filename="Initializing the library" {6} copy
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- Require the module from the path you have imported it in:
+local vfxLibrary = require(ReplicatedStorage.Packages.VFXLibrary)
+
+-- Initialize the module on the client:
+vfxLibrary.Init()
+```
+
+##### **Warning: This library was not developed to be used on the server, use on the client only!!!**
+
+After that you are good to go to use any of the effects in the module, check all of the effects currently in the library [here](/effects)
