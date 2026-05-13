@@ -65,10 +65,10 @@ export default function APIItem({
     )
   }, [])
 
-  useEffect(() => {
   let longPressTimer: ReturnType<typeof setTimeout> | null = null
   let isLongPress = false
 
+  useEffect(() => {
   const handleTouchStart = () => {
     isLongPress = false
     longPressTimer = setTimeout(() => {
