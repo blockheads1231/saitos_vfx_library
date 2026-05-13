@@ -2,8 +2,8 @@ import type {ComponentType, ReactNode} from "react"
 import {useRef, useEffect, useCallback} from "react"
 import {FiCornerDownRight} from "react-icons/fi"
 
-let globalIsLongPress = false
-let globalLongPressTimer: ReturnType<typeof setTimeout> | null = null
+let lastTapTime = 0
+let lastTapTarget: EventTarget | null = null
 
 type APIItemProps = {
   name: string
@@ -69,18 +69,6 @@ export default function APIItem({
   }, [])
 
   useEffect(() => {
-  const handleTouchStart = () => {
-    globalIsLongPress = false
-    if (globalLongPressTimer) clearTimeout(globalLongPressTimer)
-    globalLongPressTimer = setTimeout(() => {
-      globalIsLongPress = true
-    }, 500)
-  }
-
-  const handleTouchEnd = () => {
-    if (globalLongPressTimer) clearTimeout(globalLongPressTimer)
-  }
-
   const handleClickOutside = (e: MouseEvent) => {
     if (e.ctrlKey || e.metaKey) return
     if (!detailsRef.current?.contains(e.target as Node)) {
@@ -88,27 +76,38 @@ export default function APIItem({
     }
   }
 
-  const handleTouchOutside = (e: TouchEvent) => {
-    if (globalIsLongPress) return  // long press → don't close anything
+  const handleTouchEnd = (e: TouchEvent) => {
+    const now = Date.now()
     const touch = e.changedTouches[0]
     const target = document.elementFromPoint(touch.clientX, touch.clientY)
-    if (!detailsRef.current?.contains(target)) {
+    const isInside = detailsRef.current?.contains(target)
+
+    const timeSinceLastTap = now - lastTapTime
+    const isDoubleTap = timeSinceLastTap < 300 && lastTapTarget === e.target
+
+    lastTapTime = now
+    lastTapTarget = e.target
+
+    if (isDoubleTap) {
+      // Double tap: open just this block without closing others
+      if (isInside) open()  // call whatever your open fn is
+      return
+    }
+
+    // Single tap: close all others (existing behavior)
+    if (!isInside) {
       close()
     }
   }
 
   document.addEventListener("mousedown", handleClickOutside)
-  document.addEventListener("touchstart", handleTouchStart)
   document.addEventListener("touchend", handleTouchEnd)
-  document.addEventListener("touchend", handleTouchOutside)
 
   return () => {
     document.removeEventListener("mousedown", handleClickOutside)
-    document.removeEventListener("touchstart", handleTouchStart)
     document.removeEventListener("touchend", handleTouchEnd)
-    document.removeEventListener("touchend", handleTouchOutside)
   }
-}, [close])
+}, [close, open])
 
   const handleToggle = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
