@@ -19,3 +19,11 @@ body {
   font-weight: 400;
   font-style: normal;
 }
+
+:root {
+  --icon-filter: none;
+}
+
+html[class~="light"] {
+  --icon-filter: invert(0.8) brightness(1.2);
+}

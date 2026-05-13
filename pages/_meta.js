@@ -1,5 +1,5 @@
 export default {
-  index: "Introduction",
+  index: "The VFX Library",
   setup: "Setup",
-  effects: "Effects"
+  effects: "Effects",
 }
