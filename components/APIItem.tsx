@@ -4,6 +4,7 @@ import {FiCornerDownRight} from "react-icons/fi"
 
 let lastTapTime = 0
 let lastTapTarget: EventTarget | null = null
+let lastTouchEnd = 0
 
 type APIItemProps = {
   name: string
@@ -70,6 +71,7 @@ export default function APIItem({
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
+    if (Date.now() - lastTouchEnd < 500) return
     if (e.ctrlKey || e.metaKey) return
     if (!detailsRef.current?.contains(e.target as Node)) {
       close()
@@ -77,6 +79,8 @@ export default function APIItem({
   }
 
   const handleTouchEnd = (e: TouchEvent) => {
+    lastTouchEnd = Date.now()
+
     const now = Date.now()
     const touch = e.changedTouches[0]
     const target = document.elementFromPoint(touch.clientX, touch.clientY)
@@ -89,12 +93,10 @@ export default function APIItem({
     lastTapTarget = e.target
 
     if (isDoubleTap) {
-      // Double tap: open just this block without closing others
-      if (isInside) open()  // call whatever your open fn is
+      if (isInside) open()
       return
     }
 
-    // Single tap: close all others (existing behavior)
     if (!isInside) {
       close()
     }
