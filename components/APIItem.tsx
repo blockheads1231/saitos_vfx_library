@@ -66,16 +66,49 @@ export default function APIItem({
   }, [])
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (e.ctrlKey || e.metaKey) return
-      if (!detailsRef.current?.contains(e.target as Node)) {
-        close()
-      }
-    }
+  let longPressTimer: ReturnType<typeof setTimeout> | null = null
+  let isLongPress = false
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [close])
+  const handleTouchStart = () => {
+    isLongPress = false
+    longPressTimer = setTimeout(() => {
+      isLongPress = true
+    }, 500)
+  }
+
+  const handleTouchEnd = () => {
+    if (longPressTimer) clearTimeout(longPressTimer)
+  }
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (e.ctrlKey || e.metaKey) return
+    if (!detailsRef.current?.contains(e.target as Node)) {
+      close()
+    }
+  }
+
+  const handleTouchOutside = (e: TouchEvent) => {
+    if (isLongPress) return
+    const touch = e.changedTouches[0]
+    const target = document.elementFromPoint(touch.clientX, touch.clientY)
+    if (!detailsRef.current?.contains(target)) {
+      close()
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside)
+  document.addEventListener("touchstart", handleTouchStart)
+  document.addEventListener("touchend", handleTouchEnd)
+  document.addEventListener("touchend", handleTouchOutside)
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside)
+    document.removeEventListener("touchstart", handleTouchStart)
+    document.removeEventListener("touchend", handleTouchEnd)
+    document.removeEventListener("touchend", handleTouchOutside)
+    if (longPressTimer) clearTimeout(longPressTimer)
+  }
+}, [close])
 
   const handleToggle = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
