@@ -2,6 +2,9 @@ import type {ComponentType, ReactNode} from "react"
 import {useRef, useEffect, useCallback} from "react"
 import {FiCornerDownRight} from "react-icons/fi"
 
+let globalIsLongPress = false
+let globalLongPressTimer: ReturnType<typeof setTimeout> | null = null
+
 type APIItemProps = {
   name: string
   kind?: "Property" | "Method" | "Event" | "Callback"
@@ -30,10 +33,6 @@ const kindConfig = {
   Event: { icon: EventIcon, gradient: "from-yellow-400 via-amber-400 to-orange-500"},
   Callback: { icon: FiCornerDownRight, gradient: "from-violet-500 via-purple-500 to-pink-500"},
 }
-
-let longPressTimer: ReturnType<typeof setTimeout> | null = null
-let isLongPress = false
-
 
 export default function APIItem({
   name,
@@ -71,14 +70,15 @@ export default function APIItem({
 
   useEffect(() => {
   const handleTouchStart = () => {
-    isLongPress = false
-    longPressTimer = setTimeout(() => {
-      isLongPress = true
+    globalIsLongPress = false
+    if (globalLongPressTimer) clearTimeout(globalLongPressTimer)
+    globalLongPressTimer = setTimeout(() => {
+      globalIsLongPress = true
     }, 500)
   }
 
   const handleTouchEnd = () => {
-    if (longPressTimer) clearTimeout(longPressTimer)
+    if (globalLongPressTimer) clearTimeout(globalLongPressTimer)
   }
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -89,7 +89,7 @@ export default function APIItem({
   }
 
   const handleTouchOutside = (e: TouchEvent) => {
-    if (isLongPress) return
+    if (globalIsLongPress) return  // long press → don't close anything
     const touch = e.changedTouches[0]
     const target = document.elementFromPoint(touch.clientX, touch.clientY)
     if (!detailsRef.current?.contains(target)) {
@@ -107,7 +107,6 @@ export default function APIItem({
     document.removeEventListener("touchstart", handleTouchStart)
     document.removeEventListener("touchend", handleTouchEnd)
     document.removeEventListener("touchend", handleTouchOutside)
-    if (longPressTimer) clearTimeout(longPressTimer)
   }
 }, [close])
 
