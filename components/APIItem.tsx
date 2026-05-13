@@ -31,6 +31,10 @@ const kindConfig = {
   Callback: { icon: FiCornerDownRight, gradient: "from-violet-500 via-purple-500 to-pink-500"},
 }
 
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+let isLongPress = false
+
+
 export default function APIItem({
   name,
   kind = "Property",
@@ -65,21 +69,16 @@ export default function APIItem({
     )
   }, [])
 
-  let lastTapTime = 0
-  let isDoubleTap = false
-
   useEffect(() => {
-  const handleTouchStart = (e: TouchEvent) => {
-    const now = Date.now()
-    const timeSinceLastTap = now - lastTapTime
+  const handleTouchStart = () => {
+    isLongPress = false
+    longPressTimer = setTimeout(() => {
+      isLongPress = true
+    }, 500)
+  }
 
-    if (timeSinceLastTap < 300) {
-      isDoubleTap = true
-    } else {
-      isDoubleTap = false
-    }
-
-    lastTapTime = now
+  const handleTouchEnd = () => {
+    if (longPressTimer) clearTimeout(longPressTimer)
   }
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -90,7 +89,7 @@ export default function APIItem({
   }
 
   const handleTouchOutside = (e: TouchEvent) => {
-    if (isDoubleTap) return
+    if (isLongPress) return
     const touch = e.changedTouches[0]
     const target = document.elementFromPoint(touch.clientX, touch.clientY)
     if (!detailsRef.current?.contains(target)) {
@@ -100,12 +99,15 @@ export default function APIItem({
 
   document.addEventListener("mousedown", handleClickOutside)
   document.addEventListener("touchstart", handleTouchStart)
+  document.addEventListener("touchend", handleTouchEnd)
   document.addEventListener("touchend", handleTouchOutside)
 
   return () => {
     document.removeEventListener("mousedown", handleClickOutside)
     document.removeEventListener("touchstart", handleTouchStart)
+    document.removeEventListener("touchend", handleTouchEnd)
     document.removeEventListener("touchend", handleTouchOutside)
+    if (longPressTimer) clearTimeout(longPressTimer)
   }
 }, [close])
 
