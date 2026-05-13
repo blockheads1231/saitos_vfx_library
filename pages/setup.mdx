@@ -6,15 +6,24 @@ as a package that you can always update to the latest published version.
 
 After installing the package, you'll need to initialize it once on the client. After that you are good to use the effects of the library wherever.
 
-```lua filename="Initializing the library" {6} copy
+```lua filename="Initializing the library" {} copy
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
--- Require the module from the path you have imported it in:
 local vfxLibrary = require(ReplicatedStorage.Packages.VFXLibrary)
 
--- Initialize the module on the client:
 vfxLibrary.Init()
 ```
 
-##### **Warning: This library was not developed to be used on the server, use on the client only!!!**
+There are a set of settings for each effect that can be adjusted to your liking, it's highly
+recommended to visit each effect's specific settings and disable unwanted effects from Initializing
+for maximum optimization.  
+If not specified the module uses a set of default settings that are mid to lower on the preformence
+scale:
 
-After that you are good to go to use any of the effects in the module, check all of the effects currently in the library [here](/effects)
+```lua filename="Default library settings" {} copy
+local defaultLibSettings = {
+	Rocks = {Size = 500},
+	Lightning = {Size = 1000},
+}
+```
+
+**Warning: not all effects were developed to be used on the server, if an effect isn't working as intended ensure it is being initlizied in the correct enviornment.**
