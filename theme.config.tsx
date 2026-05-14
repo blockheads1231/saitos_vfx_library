@@ -1,6 +1,6 @@
 import React from 'react'
 import { FaTwitter } from 'react-icons/fa'
-import APIItem from './components/APIItem'
+import APIItem from './components/Block'
 
 const config = {
 logo: (

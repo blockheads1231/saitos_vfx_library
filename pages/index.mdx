@@ -1,4 +1,4 @@
-import APIItem from '../components/APIItem'
+import APIBlock from '../components/Block'
 
 # <img src="/icons/star_favicon.png" alt="" width="50" height="50" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '0.5rem', marginBottom: '0.5rem' }} /> VFX Ark
 
@@ -19,36 +19,41 @@ knowledge in coding or math and for those who do.
 **Coding knowledge?** VFX Ark allows for custom functions for 90% of its algorithms and effect 
 equations, the library is fully open-sourced, so feel free to edit it to your heart's content.
 
-## **Important!!**
-You'll find in this documentation blocks that'll contain a property, method, event, or a callback
-that you can click on to reveal the description. If you have a description of one of these blocks
-opened, you can click anywhere else to close it (including another block to reveal that block's description),
-or you can Ctrl + Click to open multiple and not close the already opened ones, try it here:
+## **Blocks**
+To see a block's description click on it.  
+To open multiple blocks at the same time Ctrl + click or hold click for 0.35s on mobile.
 
-<APIItem
+<APIBlock
   name="property"
   kind="Property"
   type="number"
 >
   This is a property.
-</APIItem>
-<APIItem
-  name="foo (... : any)"
+</APIBlock>
+<APIBlock
+  name="method (... : any)"
   kind="Method"
   type="( )"
 >
   This is a method.
-</APIItem>
-<APIItem
-  name="faa (... : any)"
+</APIBlock>
+<APIBlock
+  name="callback (... : any)"
+  kind="Callback"
+  type="(any)"
+>
+  This is a callback.
+</APIBlock>
+<APIBlock
+  name="event (... : any)"
   kind="Event"
   type="RBXScriptSignal"
 >
   This is an event.
-</APIItem>
+</APIBlock>
 
 **This is extremely important as some effects have 40+ properties (not including methods or events).**
 
 ## Credits
-**Head Developer and VFX artist:**  
+**Head Developer and VFX artist:**
 [Saito](https://x.com/SaitoSan1231)

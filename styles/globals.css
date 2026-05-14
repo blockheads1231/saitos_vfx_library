@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 body {
   background: linear-gradient(135deg, #d1edff, #defffe);
 }
@@ -23,9 +24,33 @@ body {
 }
 
 :root {
-  --icon-filter: none;
+  --mode-adaptive-filter: none;
 }
 
 html[class~="light"] {
-  --icon-filter: invert(0.8) brightness(1.2);
+  --mode-adaptive-filter: invert(1) brightness(1);
+}
+
+:root {
+  --reverse-adaptive-filter: none;
+}
+
+html[class~="dark"] {
+  --reverse-adaptive-filter: invert(0.8) brightness(1.2);
+}
+
+details:has(+ details) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+@keyframes gradient-loop {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-loop 2s ease infinite;
 }

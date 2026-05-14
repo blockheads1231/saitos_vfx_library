@@ -1,10 +1,7 @@
 import type {ComponentType, ReactNode} from "react"
 import {useRef, useEffect, useCallback} from "react"
-import {FiCornerDownRight} from "react-icons/fi"
 
-let lastTapTime = 0
-let lastTapTarget: EventTarget | null = null
-let lastTouchEnd = 0
+let lastTouchStart = 0
 
 type APIItemProps = {
   name: string
@@ -19,20 +16,23 @@ type APIItemProps = {
 }
 
 const PropertyIcon = () => (
-  <img src="/icons/property_icon.svg" alt="" height={13} width={13} />
+  <img src="/icons/property_icon.svg" alt="" height={20} width={20} />
 )
 const MethodIcon = () => (
-  <img src="/icons/method_icon.svg" alt="" height={18} width={18} />
+  <img src="/icons/method_icon.svg" alt="" height={24} width={24} />
 )
 const EventIcon = () => (
-  <img src="/icons/event_icon.svg" alt="" height={13} width={13} />
+  <img src="/icons/event_icon.svg" alt="" height={16} width={16} />
+)
+const CallbackIcon = () => (
+  <img src="/icons/callback_icon.svg" alt="" height={24} width={24} />
 )
 
 const kindConfig = {
   Property: { icon: PropertyIcon, gradient: "from-sky-500 via-blue-500 to-indigo-500"},
   Method: { icon: MethodIcon, gradient: "from-fuchsia-400 via-pink-500 to-purple-600"},
   Event: { icon: EventIcon, gradient: "from-yellow-400 via-amber-400 to-orange-500"},
-  Callback: { icon: FiCornerDownRight, gradient: "from-violet-500 via-purple-500 to-pink-500"},
+  Callback: { icon: CallbackIcon, gradient: "from-violet-500 via-purple-500 to-pink-500"},
 }
 
 export default function APIItem({
@@ -56,57 +56,71 @@ export default function APIItem({
     const details = detailsRef.current
     const body = bodyRef.current
     const inner = innerRef.current
+
     if (!details || !body || !inner) return
     if (!details.hasAttribute("open")) return
 
-    body.style.gridTemplateRows = "0fr"
-    inner.style.opacity = "0"
-    inner.style.transform = "translateY(8px)"
+    requestAnimationFrame(() => {
+      body.style.gridTemplateRows = "0fr"
+      inner.style.opacity = "0"
+      inner.style.transform = "translateY(8px)"
+    })
+    
     body.addEventListener(
       "transitionend",
-      () => details.removeAttribute("open"),
+      () => {details.removeAttribute("open")},
       { once: true }
     )
+
+    setTimeout(() => {
+      details.removeAttribute("open")
+    }, 350)
   }, [])
+
+  const open = useCallback(() => {
+  const details = detailsRef.current
+  const body = bodyRef.current
+  const inner = innerRef.current
+  if (!details || !body || !inner) return
+  if (details.hasAttribute("open")) return
+
+  details.setAttribute("open", "")
+  requestAnimationFrame(() => {
+    body.style.gridTemplateRows = "1fr"
+    inner.style.opacity = "1"
+    inner.style.transform = "translateY(0)"
+  })
+}, [])
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
-    if (Date.now() - lastTouchEnd < 500) return
     if (e.ctrlKey || e.metaKey) return
     if (!detailsRef.current?.contains(e.target as Node)) {
       close()
     }
   }
 
+  const handleTouchStart = (e: TouchEvent) => {
+    lastTouchStart = Date.now()
+  }
+
   const handleTouchEnd = (e: TouchEvent) => {
-    lastTouchEnd = Date.now()
-
-    const now = Date.now()
-    const touch = e.changedTouches[0]
-    const target = document.elementFromPoint(touch.clientX, touch.clientY)
-    const isInside = detailsRef.current?.contains(target)
-
-    const timeSinceLastTap = now - lastTapTime
-    const isDoubleTap = timeSinceLastTap < 300 && lastTapTarget === e.target
-
-    lastTapTime = now
-    lastTapTarget = e.target
-
-    if (isDoubleTap) {
-      if (isInside) open()
+    if (Date.now() - lastTouchStart >= 350) {
+      if (detailsRef.current?.contains(e.target as Node)) open()
       return
     }
-
-    if (!isInside) {
+    if (!detailsRef.current?.contains(e.target as Node)) {
       close()
     }
   }
 
   document.addEventListener("mousedown", handleClickOutside)
+  document.addEventListener("touchstart", handleTouchStart)
   document.addEventListener("touchend", handleTouchEnd)
 
   return () => {
     document.removeEventListener("mousedown", handleClickOutside)
+    document.removeEventListener("touchstart", handleTouchStart)
     document.removeEventListener("touchend", handleTouchEnd)
   }
 }, [close, open])
@@ -119,12 +133,7 @@ export default function APIItem({
     if (!details || !body || !inner) return
 
     if (!details.hasAttribute("open")) {
-      details.setAttribute("open", "")
-      requestAnimationFrame(() => {
-        body.style.gridTemplateRows = "1fr"
-        inner.style.opacity = "1"
-        inner.style.transform = "translateY(0)"
-      })
+      open()
     } else {
       close()
     }
@@ -133,12 +142,24 @@ export default function APIItem({
   return (
     <details
       ref={detailsRef}
-      className="group my-1 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <div className={`h-1 w-full bg-gradient-to-r ${gradient}`} />
+      className="
+      group bg-white dark:bg-zinc-900
+      overflow-hidden
+      mt-1 rounded-2xl
+
+      transition-colors
+
+      [&+details]:mt-0
+      [&+details]:rounded-t-none
+      "
+      style={{filter: 'var(--mode-adaptive-filter)', border: '1px solid rgb(57, 57, 57)'}}
+      >
+      <div className={`h-1 w-full bg-gradient-to-r ${gradient} animate-gradient`} />
 
       <summary
         className="flex cursor-pointer list-none items-center gap-2 px-2 py-2"
         onClick={handleToggle}>
+          
         <div className="flex min-w-0 flex-1 items-center gap-3">
           {Icon && (
             <span
@@ -173,7 +194,7 @@ export default function APIItem({
       
       <div
         ref={bodyRef}
-        style={{ gridTemplateRows: "0fr" }}
+        style={{gridTemplateRows: "0fr"}}
         className="grid transition-[grid-template-rows] duration-300 ease-in-out">
         <div className="overflow-hidden">
           <div
@@ -181,7 +202,7 @@ export default function APIItem({
             style={{ opacity: 0, transform: "translateY(8px)" }}
             className="transition-all duration-300 ease-in-out">
             <div className="border-t border-zinc-200 px-2 py-3 dark:border-zinc-800">
-              <div className="prose prose-zinc max-w-none dark:prose-invert">
+              <div className="prose prose-zinc max-w-none dark:prose-invert" style={{filter: 'var(--mode-adaptive-filter)',}}>
                 {children}
               </div>
 

@@ -1,4 +1,4 @@
-import APIItem from "./components/APIItem"
+import APIItem from "./components/Block"
 
 export function useMDXComponents(components: Record<string, any>) {
   return {
